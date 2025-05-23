@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Speed Typing</title>
+</head>
+<body class="bg-dark text-white">
+    <header class="bg-info p-3 mb-5 text-center">
+        <h1>Speed Typing Lite</h1>
+    </header>
+    <section class="container text-center">
+        <div class="row">
+            <div class="col-md-6 mx-auto"> <!-- auto margin - to center content -->
+                <p>Type the following word in <span id="seconds" class="text-warning"></span> seconds: </p>
+                <h2 id="current-word" class="display-2 mb-4"></h2> <!-- increased font size -->
+                <div class="form-group col-md-4 mx-auto">
+                    <label for="difficulty">Difficulty:</label>
+                    <select class="form-control" id="difficulty">
+                      <option>Easy</option>
+                      <option>Medium</option>
+                      <option>Hard</option>
+                    </select>
+                </div>
+                <input id="input-word" type="text" class="form-control form-control-lg" placeholder="Start typing ..." autofocus>
+                <h4 id="message" class="mt-3 text-warning"></h4> 
+
+                <!-- Time Left and Score -->
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h3>Time Left: <span id="time-left">0</span></h3>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Score: <span id="score">0</span></h3>
+                    </div>
+                    <!-- <div class="col-md-4">
+                        <h3>High Score: <span id="high-score">0</span></h3>
+                    </div> -->
+                </div>
+
+                <!-- Instructions -->
+                <div class="row mt-4">
+                    <div class="col-md-10 mx-auto">
+                        <div class="card card-body bg-secondary">
+                            <h5>Instructions</h5>
+                            <p>Type each word in the given amount of time to score. To play again, just type the current word. Your score will reset.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+
+
+/*  TODO:
+    - show high score, store it in local storage
+    - load random words from an API
+ */
+
+ // VARIABLES
+ let words = ['magic', 'journey', 'travel', 'explore', 'life', 
+'experience', 'happiness', 'gratitude', 'discipline', 'exercise', 
+'workout', 'friendship', 'practice', 'routine', 'morning', 'reading', 
+'books', 'education', 'amour', 'delibrate', 'protein', 'partner',
+'empathy', 'concert', 'patience', 'humor', 'resilience', 'confidence',
+'consistency', 'appreciation', 'literature', 'meaning', 'humble',
+'province', 'flight', 'alchemy', 'intense', 'adorable', 'swoon', 'stunning',
+'sensational', 'provocative', 'apocalypse', 'compliance', 'meticulous',
+'replicate', 'relentless', 'pursuit', 'proactive', 'astounding',
+'delightful', 'legitimate', 'mesmerizing', 'polarizing', 'validate'];
+
+const levels = {
+    easy: 5,
+    medium: 3,
+    hard: 2
+};
+let currentLevel = levels.easy;
+let timeCount = currentLevel + 1, 
+scoreCount = 0, 
+isPlaying,
+wordDisplayed;
+
+let currentWord  = document.querySelector('#current-word'),
+    inputWord = document.querySelector('#input-word'),
+    time = document.querySelector('#seconds'),
+    timeLeft = document.querySelector('#time-left'),
+    score = document.querySelector('#score'),
+    message = document.querySelector('#message'),
+    difficultyLevel = document.querySelector('#difficulty');
+
+
+// EVENT LISTENERS
+window.addEventListener('load', init);
+inputWord.addEventListener('input', startMatch);
+difficultyLevel.addEventListener('change', changeLevel);
+
+
+// FUCNTIONS
+function init() { 
+    time.textContent = currentLevel;
+    showWord();
+    // call the countdown function every second
+    setInterval(countdown, 1000);
+    // cheking the game status every 0.1s
+    setInterval(checkStatus, 100);
+}
+function showWord() {
+    let randomIndex = Math.floor(Math.random() * words.length);
+    wordDisplayed = words[randomIndex];
+    currentWord.textContent = wordDisplayed;
+}
+function countdown() {
+    if (timeCount > 0) {
+        // console.log(timeCount);
+        timeCount--;   
+        timeLeft.textContent = timeCount;
+    } else if(timeCount === 0) {
+        isPlaying = false;
+    }
+}
+function checkStatus() {
+    if(!isPlaying && timeCount === 0) {
+        message.textContent = 'Time Up!!';
+        score = 0
+        message.className = 'mt-3 text-danger';
+    }
+}
+function startMatch() {
+    if (this.value === wordDisplayed) {
+        isPlaying = true;
+        message.textContent  = 'Correct!!'
+        message.className = 'mt-3 text-success'
+        this.value = ''
+        scoreCount++;
+        score.textContent = scoreCount;
+        timeCount = currentLevel + 1; // will reset the clock to start the countdown again
+        showWord();
+    }
+}
+
+function changeLevel() {
+    let level = this.options[this.selectedIndex].value;
+    if (level === 'Medium') {
+        inputWord.focus();
+        scoreCount = 0;
+        message.textContent = '';
+        isPlaying = true;
+        currentLevel = levels.medium;
+        time.textContent = currentLevel;
+        timeCount = currentLevel + 1;
+        startMatch();
+    }
+    if (level === 'Hard') {
+        inputWord.focus();
+        scoreCount = 0;
+        message.textContent = '';
+        isPlaying = true;
+        currentLevel = levels.hard;
+        time.textContent = currentLevel;
+        timeCount = currentLevel + 1;
+        startMatch();
+    }
+}
+
+    </script>
+</body>
+</html>
